@@ -21,20 +21,22 @@ GREEN = (0, 255, 0)
 BUTTON_COLOR = (0, 180, 255)
 
 # Parámetros físicos fijos
-SCREEN_SIZE = 0.3
+SCREEN_SIZE = 0.3 # Se normaliza adelante
+# area de las placas ????
 PLATE_SEPARATION = 0.02
-DIST_CANNON_TO_V_PLATES = 0.05
 DIST_V_TO_H_PLATES = 0.05
+DIST_CANNON_TO_V_PLATES = 0.05
 DIST_H_PLATES_TO_SCREEN = 0.15
 ELECTRON_CHARGE = -1.6e-19
 ELECTRON_MASS = 9.11e-31
 
 # Variables controlables
-acceleration_voltage = 1000
+acceleration_voltage = 1000 # se traduce al brillo del punto
 vertical_voltage = 0
 horizontal_voltage = 0
-persistence_time = 2.0
 sine_mode = False
+persistence_time = 2.0 # latencia del rastro de puntos
+# Parámetros de onda sinusoidal
 v_frequency = 1.0
 h_frequency = 1.0
 v_phase = 0.0
@@ -48,16 +50,23 @@ point_times = []
 font = pygame.font.SysFont('Arial', 16)
 title_font = pygame.font.SysFont('Arial', 20, bold=True)
 
+# Manejo de tiempo
 clock = pygame.time.Clock()
 FPS = 60
 simulation_time = 0.0
 
 # ---------------- FUNCIONES ---------------- #
 def calculate_electron_position(acc_v, v_v, h_v):
+    # acc_v: voltaje de aceleración (V)
+    # v_v: voltaje en placas verticales (V)
+    # h_v: voltaje en placas horizontales (V)
     """Calcula la posición final de un electrón en la pantalla"""
     v0 = np.sqrt(2 * np.abs(acc_v) * np.abs(ELECTRON_CHARGE) / ELECTRON_MASS)
 
     # Campos eléctricos
+    # E = V/d
+    # V= diferencia de Voltaje
+    # d= distancia entre placas
     E_vertical = v_v / PLATE_SEPARATION
     E_horizontal = h_v / PLATE_SEPARATION
     a_vertical = (ELECTRON_CHARGE * E_vertical) / ELECTRON_MASS
@@ -69,6 +78,7 @@ def calculate_electron_position(acc_v, v_v, h_v):
     t3 = DIST_H_PLATES_TO_SCREEN / v0
 
     # Deflexiones
+    # y = y0 + v0*t + 0.5*a*t^2
     y_def = 0.5 * a_vertical * t1**2 + a_vertical * t1 * (t2 + t3)
     x_def = 0.5 * a_horizontal * t2**2 + a_horizontal * t2 * t3
 
@@ -121,7 +131,7 @@ def draw_crt(x_norm, y_norm):
     pygame.draw.rect(screen, GRAY, (280, 300, 70, 150), 2)
 
     # -------- Pantalla frontal (con rastro) --------
-    # Pantalla principal compacta y sobria
+    # Pantalla principal compacta
     pantalla_x, pantalla_y, pantalla_w, pantalla_h = 420, 60, 400, 400
     pygame.draw.rect(screen, GRAY, (pantalla_x, pantalla_y, pantalla_w, pantalla_h), 3)
 
@@ -216,12 +226,12 @@ while running:
             mx, my = event.pos
             for key, rect in button_rects.items():
                 if rect.collidepoint(mx, my):
-                    if key == "acc_minus": acceleration_voltage = max(100, acceleration_voltage - 100)
+                    if key == "acc_minus": acceleration_voltage = max(1000, acceleration_voltage - 1000)
                     elif key == "acc_plus": acceleration_voltage = min(5000, acceleration_voltage + 100)
-                    elif key == "vert_minus": vertical_voltage = max(-100, vertical_voltage - 5)
-                    elif key == "vert_plus": vertical_voltage = min(100, vertical_voltage + 5)
-                    elif key == "hor_minus": horizontal_voltage = max(-100, horizontal_voltage - 5)
-                    elif key == "hor_plus": horizontal_voltage = min(100, horizontal_voltage + 5)
+                    elif key == "vert_minus": vertical_voltage = max(-1000, vertical_voltage - 5)
+                    elif key == "vert_plus": vertical_voltage = min(1000, vertical_voltage + 5)
+                    elif key == "hor_minus": horizontal_voltage = max(-1000, horizontal_voltage - 5)
+                    elif key == "hor_plus": horizontal_voltage = min(1000, horizontal_voltage + 5)
                     elif key == "pers_minus": persistence_time = max(0.5, persistence_time - 0.5)
                     elif key == "pers_plus": persistence_time = min(10.0, persistence_time + 0.5)
                     elif key == "vfreq_minus": v_frequency = max(0.1, v_frequency - 0.1)
@@ -243,6 +253,7 @@ while running:
     x, y = calculate_electron_position(acceleration_voltage, vertical_voltage, horizontal_voltage)
 
     # Normalización
+    # centro en (0,0), rango [-1,1]
     x_norm = np.clip(x / (SCREEN_SIZE/2), -1, 1)
     y_norm = np.clip(y / (SCREEN_SIZE/2), -1, 1)
 
