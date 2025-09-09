@@ -88,47 +88,80 @@ def draw_crt(x_norm, y_norm):
     """Dibuja las vistas del CRT con haz dinámico"""
 
     # -------- Vista lateral (trayectoria vertical) --------
-    pygame.draw.rect(screen, GRAY, (50, 50, 300, 200), 2)
+    # Dibujar el tubo CRT (contorno exterior)
+    pygame.draw.ellipse(screen, WHITE, (40, 120, 40, 60), 2)  # Cuello del tubo
+    pygame.draw.lines(screen, WHITE, False, [(80, 130), (270, 80), (270, 220), (80, 170)], 2)  # Cuerpo del tubo
+    pygame.draw.rect(screen, WHITE, (270, 80, 80, 140), 2)  # Pantalla
+    
     center_y = 150
-    # Graficar rastro vertical
+    cannon_x = 70  # Posición fija del cañón
+    screen_x = 280  # Posición de la pantalla
+    
+    # Dibujar línea del haz desde el cañón hasta la pantalla (vista lateral)
     if screen_points:
-        for i in range(1, len(screen_points)):
-            y1 = int(center_y - screen_points[i-1][1] * 90)
-            y2 = int(center_y - screen_points[i][1] * 90)
-            x1 = 50 + int((i-1)/len(screen_points)*300)
-            x2 = 50 + int(i/len(screen_points)*300)
-            alpha = max(30, int(255 * (1 - (pygame.time.get_ticks()/1000.0 - point_times[i]) / persistence_time)))
-            color = (0, 255, 0, alpha)
-            s = pygame.Surface((300,200), pygame.SRCALPHA)
-            pygame.draw.line(s, color, (x1-50, y1-50), (x2-50, y2-50), 3)
-            screen.blit(s, (50, 50))
-    # Elementos fijos
-    pygame.draw.rect(screen, GRAY, (50, 140, 20, 20))  
-    pygame.draw.rect(screen, BLUE, (100, 100, 10, 100))
-    pygame.draw.rect(screen, BLUE, (120, 100, 10, 100))
-    pygame.draw.rect(screen, RED, (180, 130, 10, 40))
+        # Punto de inicio fijo en el cañón
+        start_x = cannon_x
+        start_y = center_y
+        
+        # Punto final en la pantalla con deflexión vertical
+        end_x = screen_x
+        end_y = int(center_y - screen_points[-1][1] * 90)  # Deflexión vertical
+        
+        # Dibujar la línea del haz
+        pygame.draw.line(screen, GREEN, (start_x, start_y), (end_x, end_y), 2)
+        
+        # Punto brillante en la pantalla
+        pygame.draw.circle(screen, (0, 255, 0), (end_x, end_y), 4)
+    
+    # Elementos internos del tubo
+    pygame.draw.rect(screen, GRAY, (50, 140, 20, 20))  # Cañón de electrones
+    pygame.draw.rect(screen, BLUE, (100, 100, 10, 100))  # Placa vertical (solo una)
+    pygame.draw.rect(screen, RED, (180, 130, 10, 40))   # Placas horizontales
     pygame.draw.rect(screen, RED, (200, 130, 10, 40))
-    pygame.draw.rect(screen, GRAY, (280, 50, 70, 200), 2)
+    
+    # Etiquetas
+    screen.blit(font.render("Cañón", True, WHITE), (45, 170))
+    screen.blit(font.render("Placas ", True, WHITE), (85, 85))
+    screen.blit(font.render("Placas ", True, WHITE), (175, 110))
+    screen.blit(font.render("Pantalla", True, WHITE), (275, 60))
 
-    # -------- Vista superior (solo desplazamiento horizontal, punto grande y brillante) --------
-    pygame.draw.rect(screen, GRAY, (50, 300, 300, 150), 2)
-    center_x = 200
-    center_y = 375
-    scale_x = 140  # Más amplio
+    # -------- Vista superior (trayectoria horizontal) --------
+    # Dibujar el tubo CRT (contorno exterior)
+    pygame.draw.ellipse(screen, WHITE, (40, 355, 40, 40), 2)  # Cuello del tubo
+    pygame.draw.lines(screen, WHITE, False, [(80, 340), (270, 320), (270, 430), (80, 410)], 2)  # Cuerpo del tubo
+    pygame.draw.rect(screen, WHITE, (270, 320, 80, 110), 2)  # Pantalla
+    
+    center_x_sup = 200
+    center_y_sup = 375
+    cannon_x_sup = 70  # Posición fija del cañón
+    screen_x_sup = 280  # Posición de la pantalla
+    
+    # Dibujar línea del haz desde el cañón hasta la pantalla (vista superior)
     if screen_points:
-        x = screen_points[-1][0]
-        px = int(center_x + x * scale_x)
-        py = center_y
-        s = pygame.Surface((30,30), pygame.SRCALPHA)
-        pygame.draw.circle(s, (0,255,0,220), (15,15), 13)
-        screen.blit(s, (px-15, py-15))
-    # Elementos fijos
-    pygame.draw.rect(screen, GRAY, (50, 365, 20, 20))
-    pygame.draw.rect(screen, BLUE, (100, 340, 10, 70))
-    pygame.draw.rect(screen, BLUE, (120, 340, 10, 70))
-    pygame.draw.rect(screen, RED, (180, 320, 10, 110))
-    pygame.draw.rect(screen, RED, (200, 320, 10, 110))
-    pygame.draw.rect(screen, GRAY, (280, 300, 70, 150), 2)
+        # Punto de inicio fijo en el cañón
+        start_x_sup = cannon_x_sup
+        start_y_sup = center_y_sup
+        
+        # Punto final en la pantalla con deflexión horizontal
+        end_x_sup = screen_x_sup
+        end_y_sup = int(center_y_sup + screen_points[-1][0] * 50)  # Deflexión horizontal (reducida)
+        
+        # Dibujar la línea del haz
+        pygame.draw.line(screen, GREEN, (start_x_sup, start_y_sup), (end_x_sup, end_y_sup), 2)
+        
+        # Punto brillante en la pantalla
+        pygame.draw.circle(screen, (0, 255, 0), (end_x_sup, end_y_sup), 4)
+    
+    # Elementos internos del tubo
+    pygame.draw.rect(screen, GRAY, (50, 365, 20, 20))   # Cañón de electrones
+    pygame.draw.rect(screen, BLUE, (100, 350, 10, 50))  # Placa vertical (solo una)
+    pygame.draw.rect(screen, RED, (180, 340, 10, 70))   # Placas horizontales
+    pygame.draw.rect(screen, RED, (200, 340, 10, 70))
+    
+    # Etiquetas
+    screen.blit(font.render("Cañón", True, WHITE), (45, 440))
+    screen.blit(font.render("V", True, WHITE), (100, 330))
+    screen.blit(font.render("H", True, WHITE), (185, 320))
 
     # -------- Pantalla frontal (con rastro) --------
     # Pantalla principal compacta
