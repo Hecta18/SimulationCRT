@@ -78,8 +78,8 @@ def calculate_electron_position(acc_v, v_v, h_v):
 
     # Deflexiones
     # y = y0 + v0*t + 0.5*a*t^2
-    y_def = 0.5 * a_vertical * t1**2 + a_vertical * t1 * (t2 + t3)
-    x_def = 0.5 * a_horizontal * t2**2 + a_horizontal * t2 * t3
+    y_def = (0.5 * a_vertical * t1**2 + a_vertical * t1 * (t2 + t3))*4
+    x_def = (0.5 * a_horizontal * t2**2 + a_horizontal * t2 * t3)*4
 
     return x_def, y_def
 
