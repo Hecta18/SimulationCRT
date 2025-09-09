@@ -121,8 +121,8 @@ def draw_crt(x_norm, y_norm):
     
     # Etiquetas
     screen.blit(font.render("Cañón", True, WHITE), (45, 170))
-    screen.blit(font.render("Placas ", True, WHITE), (85, 85))
-    screen.blit(font.render("Placas ", True, WHITE), (175, 110))
+    screen.blit(font.render("Placas V", True, WHITE), (85, 85))
+    screen.blit(font.render("Placas H", True, WHITE), (175, 110))
     screen.blit(font.render("Pantalla", True, WHITE), (275, 60))
 
     # -------- Vista superior (trayectoria horizontal) --------
@@ -168,7 +168,7 @@ def draw_crt(x_norm, y_norm):
     pantalla_x, pantalla_y, pantalla_w, pantalla_h = 420, 60, 400, 400
     pygame.draw.rect(screen, GRAY, (pantalla_x, pantalla_y, pantalla_w, pantalla_h), 3)
 
-    zoom_factor = 0.95
+    zoom_factor = 1.8  # Aumentado para hacer las figuras más grandes
     current_time = pygame.time.get_ticks() / 1000.0 # milisegundos a segundos
 
     # Dibujar puntos con rastro (fade)
@@ -178,6 +178,9 @@ def draw_crt(x_norm, y_norm):
             alpha = max(30, int(255 * (1 - age / persistence_time))) # transparencia, "fade"
             px = int(pantalla_x + pantalla_w/2 + x * (pantalla_w/2 * zoom_factor)) # posicion
             py = int(pantalla_y + pantalla_h/2 - y * (pantalla_h/2 * zoom_factor))
+            # Asegurar que los puntos no se salgan de la pantalla
+            px = max(pantalla_x + 4, min(pantalla_x + pantalla_w - 4, px))
+            py = max(pantalla_y + 4, min(pantalla_y + pantalla_h - 4, py))
             s = pygame.Surface((8,8), pygame.SRCALPHA) # sobre la cual se dibuja el punto
             pygame.draw.circle(s, (color[0], color[1], color[2], alpha), (4,4), 3)
             screen.blit(s, (px-4, py-4)) # dibujar
