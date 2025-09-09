@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-import sys
+import sys # salir del programa
 from pygame.locals import *
 
 # Inicializar pygame
@@ -22,7 +22,6 @@ BUTTON_COLOR = (0, 180, 255)
 
 # Parámetros físicos fijos
 SCREEN_SIZE = 0.3 # Se normaliza adelante
-# area de las placas ????
 PLATE_SEPARATION = 0.02
 DIST_V_TO_H_PLATES = 0.05
 DIST_CANNON_TO_V_PLATES = 0.05
@@ -106,6 +105,7 @@ def draw_crt(x_norm, y_norm):
         # Punto final en la pantalla con deflexión vertical
         end_x = screen_x
         end_y = int(center_y - screen_points[-1][1] * 90)  # Deflexión vertical
+        # screen_points[-1][1](punto mas reciente) está normalizado en [-1,1], se escala a 90 píxeles
         
         # Dibujar la línea del haz
         pygame.draw.line(screen, GREEN, (start_x, start_y), (end_x, end_y), 2)
@@ -131,7 +131,7 @@ def draw_crt(x_norm, y_norm):
     pygame.draw.lines(screen, WHITE, False, [(80, 340), (270, 320), (270, 430), (80, 410)], 2)  # Cuerpo del tubo
     pygame.draw.rect(screen, WHITE, (270, 320, 80, 110), 2)  # Pantalla
     
-    center_x_sup = 200
+    # center_x_sup = 200
     center_y_sup = 375
     cannon_x_sup = 70  # Posición fija del cañón
     screen_x_sup = 280  # Posición de la pantalla
@@ -169,18 +169,18 @@ def draw_crt(x_norm, y_norm):
     pygame.draw.rect(screen, GRAY, (pantalla_x, pantalla_y, pantalla_w, pantalla_h), 3)
 
     zoom_factor = 0.95
-    current_time = pygame.time.get_ticks() / 1000.0
+    current_time = pygame.time.get_ticks() / 1000.0 # milisegundos a segundos
 
     # Dibujar puntos con rastro (fade)
     for i, (x, y, color) in enumerate(screen_points):
         age = current_time - point_times[i]
-        if age < persistence_time:
-            alpha = max(30, int(255 * (1 - age / persistence_time)))
-            px = int(pantalla_x + pantalla_w/2 + x * (pantalla_w/2 * zoom_factor))
+        if age < persistence_time: # aun visible
+            alpha = max(30, int(255 * (1 - age / persistence_time))) # transparencia, "fade"
+            px = int(pantalla_x + pantalla_w/2 + x * (pantalla_w/2 * zoom_factor)) # posicion
             py = int(pantalla_y + pantalla_h/2 - y * (pantalla_h/2 * zoom_factor))
-            s = pygame.Surface((8,8), pygame.SRCALPHA)
+            s = pygame.Surface((8,8), pygame.SRCALPHA) # sobre la cual se dibuja el punto
             pygame.draw.circle(s, (color[0], color[1], color[2], alpha), (4,4), 3)
-            screen.blit(s, (px-4, py-4))
+            screen.blit(s, (px-4, py-4)) # dibujar
 
 def draw_ui():
     """Dibuja los controles en la interfaz"""
@@ -216,15 +216,15 @@ def draw_ui():
     # Primera fila
     for i, p in enumerate(params):
         x = start_x + i * spacing
-        screen.blit(font.render(f"{p['label']}: {p['value']}", True, text_color), (x, label_y1))
-        rect_minus = pygame.Rect(x, start_y1, button_w, button_h)
-        pygame.draw.rect(screen, BUTTON_COLOR, rect_minus)
-        screen.blit(font.render("-", True, WHITE), (x+8, start_y1+6))
-        button_rects[p['id']+"_minus"] = rect_minus
-        rect_plus = pygame.Rect(x+button_w+8, start_y1, button_w, button_h)
-        pygame.draw.rect(screen, BUTTON_COLOR, rect_plus)
-        screen.blit(font.render("+", True, WHITE), (x+button_w+16, start_y1+6))
-        button_rects[p['id']+"_plus"] = rect_plus
+        screen.blit(font.render(f"{p['label']}: {p['value']}", True, text_color), (x, label_y1)) # texto
+        rect_minus = pygame.Rect(x, start_y1, button_w, button_h) # botón -
+        pygame.draw.rect(screen, BUTTON_COLOR, rect_minus) # dibujar botón
+        screen.blit(font.render("-", True, WHITE), (x+8, start_y1+6)) # símbolo -
+        button_rects[p['id']+"_minus"] = rect_minus # guardar rectángulo para clic
+        rect_plus = pygame.Rect(x+button_w+8, start_y1, button_w, button_h) # botón +
+        pygame.draw.rect(screen, BUTTON_COLOR, rect_plus) # dibujar botón
+        screen.blit(font.render("+", True, WHITE), (x+button_w+16, start_y1+6)) # símbolo +
+        button_rects[p['id']+"_plus"] = rect_plus # guardar rectángulo para clic
     # Segunda fila
     for i, p in enumerate(extra_params):
         x = start_x + i * spacing
@@ -258,7 +258,7 @@ while running:
         elif event.type == MOUSEBUTTONDOWN:
             mx, my = event.pos
             for key, rect in button_rects.items():
-                if rect.collidepoint(mx, my):
+                if rect.collidepoint(mx, my): # reacción al clic
                     if key == "acc_minus": acceleration_voltage = max(1000, acceleration_voltage - 1000)
                     elif key == "acc_plus": acceleration_voltage = min(5000, acceleration_voltage + 100)
                     elif key == "vert_minus": vertical_voltage = max(-1000, vertical_voltage - 5)
@@ -297,14 +297,14 @@ while running:
     screen_points.append((x_norm, y_norm, color))
     point_times.append(pygame.time.get_ticks() / 1000.0)
 
-    if len(screen_points) > 1000:
+    if len(screen_points) > 1000: # limitar cantidad de puntos
         screen_points.pop(0)
         point_times.pop(0)
 
     screen.fill(BLACK)
     draw_crt(x_norm, y_norm)
     draw_ui()
-    pygame.display.flip()
+    pygame.display.flip() # actualizar pantalla
 
 pygame.quit()
 sys.exit()
