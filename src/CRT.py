@@ -282,8 +282,8 @@ while running:
 
     # Voltajes sinusoidales
     if sine_mode:
-        vertical_voltage = 50 * np.sin(2*np.pi*v_frequency*simulation_time + v_phase)
-        horizontal_voltage = 50 * np.sin(2*np.pi*h_frequency*simulation_time + h_phase)
+        vertical_voltage = 50 * np.sin(2*np.pi*v_frequency*simulation_time + np.pi*v_phase)
+        horizontal_voltage = 50 * np.sin(2*np.pi*h_frequency*simulation_time + np.pi*h_phase)
 
     # Simulación de punto
     x, y = calculate_electron_position(acceleration_voltage, vertical_voltage, horizontal_voltage)
